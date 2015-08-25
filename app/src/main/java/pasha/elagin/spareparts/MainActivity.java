@@ -1,29 +1,33 @@
 package pasha.elagin.spareparts;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import pasha.elagin.spareparts.data.Part;
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
 
-    Button scanBtn;
-    TextView resultTextView;
+    final int REQUEST_CODE_ADD_PART = 1;
+
+    private List<Part> partList;
+    private Button buttonAddPart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        scanBtn = (Button)findViewById(R.id.buttonScan);
-        scanBtn.setOnClickListener(this);
-
-        resultTextView = (TextView)findViewById(R.id.resultTextView);
+        partList = new ArrayList<>();
+        buttonAddPart = (Button) findViewById(R.id.buttonAddPart);
+        buttonAddPart.setOnClickListener(this);
     }
 
 
@@ -53,28 +57,26 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     public void onClick(View v) {
         int id = v.getId();
         switch (id) {
-            case R.id.buttonScan:
-                scan();
+            case R.id.buttonAddPart:
+                Intent intent = new Intent(this, AddPartActivity.class);
+                startActivityForResult(intent, REQUEST_CODE_ADD_PART);
                 break;
             default:
                 break;
         }
     }
 
-    private void scan() {
-
-        Intent intent = new Intent("com.google.zxing.client.android.SCAN"); intent.putExtra("com.google.zxing.client.android.SCAN.SCAN_MODE", "QR_CODE_MODE"); startActivityForResult(intent, 0);
-    }
-
-    public void onActivityResult(int requestCode, int resultCode, Intent intent){
-        if(requestCode == 0){
-            if(resultCode == RESULT_OK){
-                String contents = intent.getStringExtra("SCAN_RESULT");
-                String format = intent.getStringExtra("SCAN_RESULT_FORMAT");
-                resultTextView.setText("contents: " + contents + " format: " + format);
-            }
-            else if(resultCode == RESULT_CANCELED){ // Handle cancel
-                resultTextView.setText("Cancelled");
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (requestCode == REQUEST_CODE_ADD_PART) {
+            if (resultCode == RESULT_OK) {
+                Bundle b = intent.getExtras();
+                int count = b.getInt("count");
+                for (int i = 0; i < count; i++) {
+                    String id = b.getString("id");
+                    String name = b.getString("name");
+                    Double price = b.getDouble("price");
+                    partList.add(new Part(id, name, price));
+                }
             }
         }
     }
