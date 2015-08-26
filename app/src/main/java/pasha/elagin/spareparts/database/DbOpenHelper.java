@@ -23,7 +23,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
     }
 
     private void createSchema(SQLiteDatabase db) {
-        String createTableParts = "CREATE TABLE IF NOT EXISTS parts (catalog_number text, name text, price real)";
+        String createTableParts = "CREATE TABLE IF NOT EXISTS parts ( id INTEGER PRIMARY KEY, catalog_number text, name text, price real)";
         db.execSQL(createTableParts);
     }
 }

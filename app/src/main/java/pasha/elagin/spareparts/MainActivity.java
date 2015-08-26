@@ -3,9 +3,11 @@ package pasha.elagin.spareparts;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -20,9 +22,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     final int REQUEST_CODE_ADD_PART = 1;
 
+    final int MENU_OPTION_DELETE = 1;
+
     private List<Part> partList;
     private Button buttonAddPart;
     private PartListAdapter adapter;
+    private ListView lv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +42,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         adapter = new PartListAdapter(this, partList);
 
-        final ListView lv = (ListView) findViewById(R.id.listView);
+        lv = (ListView) findViewById(R.id.listView);
         lv.setAdapter(adapter);
+
+        registerForContextMenu(lv);
     }
 
     @Override
@@ -91,6 +98,31 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 }
                 adapter.notifyDataSetChanged();
             }
+        }
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        if (v.getId() == R.id.listView) {
+//            ListView lv = (ListView) v;
+//            AdapterViewCompat.AdapterContextMenuInfo acmi = (AdapterViewCompat.AdapterContextMenuInfo) menuInfo;
+//            Part item = (Part) lv.getItemAtPosition(acmi.position);
+            menu.add(Menu.NONE, MENU_OPTION_DELETE, 0, R.string.delete);
+        }
+    }
+
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        Part part = (Part) lv.getItemAtPosition(info.position);
+
+        switch (item.getItemId()) {
+            case MENU_OPTION_DELETE:
+                adapter.remove(part);
+                return true;
+            default:
+                return false;
         }
     }
 }
