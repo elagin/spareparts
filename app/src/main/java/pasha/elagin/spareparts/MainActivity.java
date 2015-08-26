@@ -7,11 +7,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import pasha.elagin.spareparts.data.Part;
+import pasha.elagin.spareparts.data.PartListAdapter;
+import pasha.elagin.spareparts.database.Parts;
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
 
@@ -19,6 +22,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     private List<Part> partList;
     private Button buttonAddPart;
+    private PartListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,10 +30,16 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         partList = new ArrayList<>();
+        partList = Parts.get(this);
+
         buttonAddPart = (Button) findViewById(R.id.buttonAddPart);
         buttonAddPart.setOnClickListener(this);
-    }
 
+        adapter = new PartListAdapter(this, partList);
+
+        final ListView lv = (ListView) findViewById(R.id.listView);
+        lv.setAdapter(adapter);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -75,8 +85,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                     String id = b.getString("id");
                     String name = b.getString("name");
                     Double price = b.getDouble("price");
-                    partList.add(new Part(id, name, price));
+                    Part part = new Part(id, name, price);
+                    partList.add(part);
+                    Parts.add(this, part);
                 }
+                adapter.notifyDataSetChanged();
             }
         }
     }
